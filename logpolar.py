@@ -67,39 +67,3 @@ class LogPolar(Layer):
 
     def compute_output_shape(self, input_shape):
         return input_shape
-
-def LogPolarLambda(x):
-    def pre_logpolar(window):
-        n, m = window.shape
-        #radius, xc, yc, imgkey = util.aplicasift(img)
-        #radius = m / 2
-        xc = n / 2
-        yc = m / 2
-        
-        pre = util.logpolarnaive(window, xc, yc)
-        return pre
-
-    def process_filters(img):
-        filters = pre_logpolar(img)
-        return filters
-
-    def process_samples(inp):
-        # needs: number of filters, kernel size, stride, padding, activation
-        num, n, m, d = inp.shape
-        res = np.zeros((num,n,m,d))
-        for i in range(num):
-            for c in range(d):
-                img = inp[i,...,c]
-                lpimg = process_filters(img)
-                res[i, ..., c] = lpimg
-        return inp.astype('float32')
-
-    num, n, m, d = x.get_shape().as_list()
-    outputs = tf.reshape(tf.py_func(process_samples,[x],tf.float32),(-1, n, m, d))
-    #outputs.set_shape(x.get_shape())
-    #num, n, m, d = x.get_shape().as_list()
-    #outputs = activations.get('sigmoid')(tf.reshape(outputs,[-1, n, m, d]))
-    return outputs
-
-def LogPolarLambda_output_shape(input_shape):
-    return input_shape
